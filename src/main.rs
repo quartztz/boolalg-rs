@@ -2,18 +2,34 @@ use std::collections::HashMap;
 
 type Context = HashMap<char, bool>;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq)]
 enum Op {
     And, 
     Or
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+fn op_symbol(o: Op) -> String{
+    use Op::*;
+
+    match o {
+        And => "^".to_string(),
+        Or => "v".to_string(),
+        _ => todo!("what"),
+    }
+}
+
+#[derive(Debug, PartialEq, Eq)]
 enum Expr {
     Lit(bool),                       // literal, True or False 
     Var(char),                       // name of variable value, single char for now
     Not(Box<Expr>),                  // ¬
     BinOp(Op, Box<Expr>, Box<Expr>), // ^, v
+}
+
+impl Expr {
+    fn from_bool(b: bool) -> Expr {
+        Expr::Lit(b)
+    }
 }
 
 fn evaluate(e: Expr) -> Expr { // add a context later?
@@ -66,7 +82,6 @@ fn evaluate(e: Expr) -> Expr { // add a context later?
 
 fn substitute(e: Expr, c: &Context) -> Expr {
     use Expr::*; 
-    use Op::*; 
 
     match e {
         Lit(_) => e,
@@ -79,6 +94,18 @@ fn substitute(e: Expr, c: &Context) -> Expr {
         },
         Not(e) => Not(Box::new(substitute(*e, c))),
         BinOp(op, e1, e2) => BinOp(op, Box::new(substitute(*e1, c)), Box::new(substitute(*e2, c))),
+    }
+}
+
+fn show_bin_op(e: Expr) -> String {
+    use Expr::*;
+    match e {
+        BinOp(op, e1, e2) => { 
+            let s1: String = show(*e1); 
+            let s2: String = show(*e2); 
+            format!("{} {} {}", s1, op_symbol(op), s2)
+        },
+        _ => todo!("what"),
     }
 }
 
@@ -99,12 +126,17 @@ fn show(e: Expr) -> String {
 }
 
 fn main() {
-    let BT = Box::new(Expr::Lit(true)); 
-    let BF = Box::new(Expr::Lit(false)); 
     
-    let render: String = show(Expr::BinOp(Op::And, Box::new(Expr::Not(BF)), Box::new(Expr::Var('x'))));
+    let mut C: Context = HashMap::new(); 
 
-    println!("{}", render);
+    C.insert('x', false);
+
+    let e1: Expr = Expr::BinOp(Op::Or, Box::new(Expr::from_bool(false)), Box::new(Expr::Var('x')));
+    let e2: Expr = Expr::BinOp(Op::Or, Box::new(Expr::from_bool(false)), Box::new(Expr::Var('x')));
+    println!("{}", show(evaluate(e1)));
+    let e3: Expr = substitute(e2, &C);
+    println!("{}", show(evaluate(e3)));
+
 }
 
 
