@@ -1,4 +1,4 @@
-#`boolalg-rs` a boolean algebra library to practice language parsing
+# `boolalg-rs` a boolean algebra library to practice language parsing
 
 pretty empty for now, but it will end up being useful someday. 
 
