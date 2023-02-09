@@ -11,3 +11,9 @@ To be potentially turned into a wasm project.
 - [ ] make it easier to use and test => add an interface
 - [ ] restructure the code into a more Model View Controller format => make it a library?
 - [ ] i'm out of stuff but i always have three points here.
+
+### Inspirations/Credits
+
+This project was motivated by my hate of my CS-101 class. What a learning experience that was. 
+
+The parsing is heavily inspired by this resource right here: [Parser In Rust](https://adriann.github.io/rust_parser.html). It's very detailed and only needed a little coaxing to work with my integration. 
