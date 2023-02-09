@@ -153,10 +153,17 @@ impl Evaluator {
     /// ### Returns
     /// true if `var` was already defined, false otherwise
     
-    pub fn update_var(&mut self, var: char, val: bool) -> bool {
-        match self.context.insert(var, val) {
-            Some(v) => true,
-            None => false, 
+    pub fn update_var(&mut self, var: char, val: &str) -> bool {
+        match val {
+            "T" | "F" => match self.context.insert(var, val == "T") {
+                Some(v) => true,
+                None => false,
+            },
+            "-" => match self.context.remove(&var) {
+                Some(v) => true, 
+                None => false,
+            }
+            _ => panic!("unknown input") // should be a result
         }
     }
 
@@ -164,7 +171,7 @@ impl Evaluator {
     /// Potentially useless. 
     /// 
     /// ### Returns
-    /// the amount of
+    /// the amount of variables we have defined.
 
     pub fn count_vars(&self) -> usize {
         self.context.len()
