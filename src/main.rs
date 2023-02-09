@@ -1,29 +1,52 @@
+#[allow(unused_imports)]
+
 use crate::alg::*; 
+use crate::parse::*; 
 #[macro_use]
 mod alg; 
+mod parse; 
 
 fn int_to_bool(val: usize) -> bool {
     if val % 2 == 0 { false } else { true }
 }
 
-fn main() {
+fn main() -> Result<(), String> {
+    let stdin = std::io::stdin();
+
     let mut eval: Evaluator = Evaluator::new();
+    let parser: Parser = Parser {}; 
+    let mut inpt: String = String::new(); 
+    let mut done: bool = false; 
 
-    let f = Expr::BinOp(Op::And, bbox!(Expr::Var('a')), bbox!(Expr::Var('b'))); 
+    while !done {
+        inpt = String::new(); 
+        stdin.read_line(&mut inpt).unwrap();
+        
+        inpt = (&inpt[..inpt.len() - 1]).to_owned();
+        
+        // ugly
+        if inpt == "close" {
+            done = true;
+        } else if inpt == "help" {
+            println!("TODO");
+        } else if inpt.starts_with("?: ") { // query
+            let parsed = parser.parse(&inpt[3..])?;
+            println!("parsed => {}", parsed.render()); 
+            let evaled = eval.evaluate(parsed); 
+            println!("evaluated => {}", evaled.render());    
+        } else if inpt.starts_with("!: ") { // directive
+            // input must be of shape char -> {T | F}
+            let dir: Vec<char> = (&inpt[3..]).chars().collect();
+            let var = dir.get(0).unwrap(); 
+            let val = dir.last().unwrap() == &'T';
 
-    eval.update_var('a', false);
-    eval.update_var('b', false);
+            println!("=> setting {} to {}", var, val); 
 
-    let n = eval.count_vars();  
-    let vars = eval.context.keys().clone(); 
-
-    for i in 0..usize::pow(2, n as u32) {
-        let mut j = 0;
-
-        // TODO this doesn't work. 
-        for k in vars.into_iter() {
-            eval.update_var(*k, int_to_bool(i >> j)); 
-            j += 1; 
+            eval.update_var(*var, val);
+        } else {
+            println!("bad input.");
         }
     }
+
+    Ok(())
 }
