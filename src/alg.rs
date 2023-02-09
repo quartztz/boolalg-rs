@@ -39,10 +39,6 @@ pub enum Expr {
 }
 
 impl Expr {
-    pub fn from_bool(b: bool) -> Expr {
-        Expr::Lit(b)
-    }
-
     pub fn render(&self) -> String {
         use Expr::*; // would want to avoid this ideally. 
         
@@ -56,6 +52,18 @@ impl Expr {
                 format!("({} {} {})", s1, op.sym(), s2)
             },
         }
+    }
+}
+
+impl From<bool> for Expr {
+    fn from(other: bool) -> Expr {
+        Expr::Lit(other)
+    }
+}
+
+impl From<char> for Expr {
+    fn from(other: char) -> Expr {
+        Expr::Var(other)
     }
 }
 
@@ -113,7 +121,7 @@ fn substitute(e: Expr, c: &Context) -> Expr {
         Lit(_) => e,
         Var(n) => {
             match c.get(&n) {
-                Some(b) => Expr::from_bool(*b),
+                Some(b) => Expr::from(*b),
                 None => e
             }
         },
