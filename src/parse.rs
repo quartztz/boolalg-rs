@@ -195,4 +195,23 @@ mod tests {
     
     assert_eq!(expr, Expr::Not(bbox!(Expr::Var('a'))));
   }
+
+  #[test]
+  fn parse_parentheses_1() {
+    let p = Parser {}; 
+    let expr = p.parse("(a v b) ^ c").unwrap();
+    
+    println!("{}", expr.render()); 
+    
+    assert_eq!(expr, Expr::BinOp(Op::And, bbox!(Expr::BinOp(Op::Or, bbox!(Expr::Var('a')), bbox!(Expr::Var('b')))), bbox!(Expr::Var('c'))));
+  }
+  #[test]
+  fn parse_parentheses_2() {
+    let p = Parser {}; 
+    let expr = p.parse("a v (b ^ c)").unwrap();
+    
+    println!("{}", expr.render()); 
+    
+    assert_eq!(expr, Expr::BinOp(Op::Or, bbox!(Expr::Var('a')), bbox!(Expr::BinOp(Op::And, bbox!(Expr::Var('b')), bbox!(Expr::Var('c'))))));
+  }
 }
